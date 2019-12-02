@@ -64,10 +64,10 @@ def validate(assignments_of_person, team_of_person, num_reviews, size_of_team):
 
 
 # Write the review assignments to file.
-def write(assignments_of_person, output_file):
+def write(assignments_of_person, team_of_person, output_file):
     with open(output_file, 'w') as f:
         for person, assignments in enumerate(assignments_of_person):
-            line = str(person)
+            line = "{},{}".format(person, team_of_person[person])
             for assignment in assignments:
                 line += ",{}".format(assignment)
             f.write(line + "\n")
@@ -101,7 +101,7 @@ def main():
                                                           teams_of_size,
                                                           teams_of_size_index,
                                                           offsets)
-    write(assignments_of_person, output_file)
+    write(assignments_of_person, team_of_person, output_file)
     validate(assignments_of_person, team_of_person, num_reviews, size_of_team)
 
 
