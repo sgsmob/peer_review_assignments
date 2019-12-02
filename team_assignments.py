@@ -1,6 +1,3 @@
-import argparse as ap
-
-
 # Read the team sizes file into a list of team sizes.
 def read_team_sizes(input_file):
     with open(input_file) as f:
@@ -76,10 +73,11 @@ def write(assignments_of_person, output_file):
             f.write(line + "\n")
 
 
-def main(args):
-    size_of_team = read_team_sizes(args.team_sizes)
-    num_reviews = args.num_reviews
-    output_file = args.output_file
+def main():
+    team_sizes = "team_sizes.txt"
+    num_reviews = 5
+    output_file = "assignments.csv"
+    size_of_team = read_team_sizes(team_sizes)
 
     #
     # Initialize lookup tables
@@ -108,10 +106,4 @@ def main(args):
 
 
 if __name__ == "__main__":
-    parser = ap.ArgumentParser()
-    parser.add_argument("team_sizes", help="filename with team sizes")
-    parser.add_argument("num_reviews", type=int,
-                        help="number of reviews per person")
-    parser.add_argument("output_file",
-                        help="filename where the output will be written")
-    main(parser.parse_args())
+    main()
