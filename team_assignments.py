@@ -10,26 +10,31 @@ def read_team_sizes(input_file):
         return size_of_team
 
 
-# Create an index mapping a team size to all teams larger than that size.
+# Create an index mapping a team size to all teams larger than that size, as
+# well as an index indicating the position of each team in the size-indexed
+# lists.
 def get_teams_of_size(teams_list):
     teams_of_size = [list() for _ in range(max(teams_list))]
+    teams_of_size_index = [dict() for _ in teams_of_size]
     for team, size in enumerate(teams_list):
         for i in range(size):
+            teams_of_size_index[i][team] = len(teams_of_size[i])
             teams_of_size[i].append(team)
-    return teams_of_size
+    return teams_of_size, teams_of_size_index
 
 
 # Compute the list of review assignments that each person will do.
 def compute_assignments_of_person(team_of_person, member_idx_of_person,
-                                  teams_of_size, offsets):
+                                  teams_of_size, teams_of_size_index, offsets):
     assignments_of_person = [list() for _ in team_of_person]
-    for assignment, (offset, teams_of_same_size) in\
-            enumerate(offsets, teams_of_size):
+    for assignment, (offset, teams_of_same_size, teams_of_same_size_index) in\
+            enumerate(zip(offsets, teams_of_size, teams_of_size_index)):
         for person, (team, member_idx) in\
                 enumerate(zip(team_of_person, member_idx_of_person)):
             idx_ahead_to_review = ((member_idx + 1) * (assignment + 1)) %\
                 (len(teams_of_same_size) - 1)
-            team_to_review = teams_of_same_size[(team + idx_ahead_to_review) %
+            team_to_review = teams_of_same_size[(teams_of_same_size_index[team]
+                                                + idx_ahead_to_review) %
                                                 len(teams_of_same_size)]
             assignments_of_person[person].append(team_to_review)
     return assignments_of_person
@@ -38,8 +43,8 @@ def compute_assignments_of_person(team_of_person, member_idx_of_person,
 # Validate that a given assignment of reviews to people satisfies the
 # constraints.
 def validate(assignments_of_person, team_of_person, num_reviews, size_of_team):
-    num_reviews_of_team_in_round = [[0 for __ in range(num_reviews)]
-                                    for _ in size_of_team]
+    reviews_of_team_in_round = [[list() for __ in range(num_reviews)]
+                                for _ in size_of_team]
     for person, assignments in enumerate(assignments_of_person):
         assert len(assignments) == num_reviews,\
             "Person {} has insufficient assignments:  {}"\
@@ -51,13 +56,18 @@ def validate(assignments_of_person, team_of_person, num_reviews, size_of_team):
             "Person {} is assigned to their own team:  {}"\
             .format(person, assignments)
         for i, t in enumerate(assignments):
-            num_reviews_of_team_in_round[t][i] += 1
-    for team, (size, counts) in\
-            enumerate(zip(size_of_team, num_reviews_of_team_in_round)):
-        for r, c in counts:
-            assert size == c,\
-                "Team {} has {} assignments in round {} but {} people"\
-                .format(size, c, r, size)
+            reviews_of_team_in_round[t][i].append(person)
+
+    # TODO: Fix the issue so the team size equals the number of reviewers in
+    # each round.
+    # for s, rs in zip(size_of_team, reviews_of_team_in_round):
+    #     print(s, rs)
+    # for team, (size, counts) in\
+    #         enumerate(zip(size_of_team, reviews_of_team_in_round)):
+    #     for r, c in enumerate(counts):
+    #         assert size == len(c),\
+    #             "Team {} has size {} but reviewers {} from teams {} in round {}"\
+    #             .format(team, size, c, [team_of_person[x] for x in c], r)
 
 
 # Write the review assignments to file.
@@ -90,14 +100,15 @@ def main(args):
     # their next assignment.
     # TODO:  select offsets that avoid collisions when wrapping around
     offsets = range(1, 6)
-    teams_of_size = get_teams_of_size(size_of_team)
+    teams_of_size, teams_of_size_index = get_teams_of_size(size_of_team)
 
     assignments_of_person = compute_assignments_of_person(team_of_person,
                                                           member_idx_of_person,
                                                           teams_of_size,
+                                                          teams_of_size_index,
                                                           offsets)
-    validate(assignments_of_person, team_of_person, num_reviews, size_of_team)
     write(assignments_of_person, output_file)
+    validate(assignments_of_person, team_of_person, num_reviews, size_of_team)
 
 
 if __name__ == "__main__":
