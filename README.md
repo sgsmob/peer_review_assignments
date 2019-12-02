@@ -14,7 +14,8 @@ Arguments:
 ## Algorithm overview
 We order the teams 0,...,_n_-1, where _n_ is the number of teams and each member of the team 0,...,_m_-1, where _m_ is the size of the team.  Suppose we want 5 reviews.
   * Person 0 of team 0 reviews teams \[1, 2, 3, 4, 5\]
-  * Person 1 of team 0 reviews teams \[1, 3, 5, 7, 9\]
-  * Person 2 of team 0 reviews teams \[1, 4, 7, 10, 13\]
+  * Person 1 of team 0 reviews teams \[2, 4, 6, 8, 10\]
+  * Person 2 of team 0 reviews teams \[3, 6, 9, 13, 15\]
+  * etc.
   * Person 0 of team 1 reviews teams \[2, 3, 4, 5, 6\]
   * etc.
