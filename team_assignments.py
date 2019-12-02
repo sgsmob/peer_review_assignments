@@ -27,10 +27,11 @@ def get_teams_of_size(teams_list):
 def compute_assignments_of_person(team_of_person, member_idx_of_person,
                                   teams_of_size, teams_of_size_index, offsets):
     assignments_of_person = [list() for _ in team_of_person]
-    for assignment, (offset, teams_of_same_size, teams_of_same_size_index) in\
-            enumerate(zip(offsets, teams_of_size, teams_of_size_index)):
+    for assignment, offset in enumerate(offsets):
         for person, (team, member_idx) in\
                 enumerate(zip(team_of_person, member_idx_of_person)):
+            teams_of_same_size = teams_of_size[member_idx]
+            teams_of_same_size_index = teams_of_size_index[member_idx]
             idx_ahead_to_review = ((member_idx + 1) * (assignment + 1)) %\
                 (len(teams_of_same_size) - 1)
             team_to_review = teams_of_same_size[(teams_of_same_size_index[team]
@@ -57,17 +58,12 @@ def validate(assignments_of_person, team_of_person, num_reviews, size_of_team):
             .format(person, assignments)
         for i, t in enumerate(assignments):
             reviews_of_team_in_round[t][i].append(person)
-
-    # TODO: Fix the issue so the team size equals the number of reviewers in
-    # each round.
-    # for s, rs in zip(size_of_team, reviews_of_team_in_round):
-    #     print(s, rs)
-    # for team, (size, counts) in\
-    #         enumerate(zip(size_of_team, reviews_of_team_in_round)):
-    #     for r, c in enumerate(counts):
-    #         assert size == len(c),\
-    #             "Team {} has size {} but reviewers {} from teams {} in round {}"\
-    #             .format(team, size, c, [team_of_person[x] for x in c], r)
+    for team, (size, counts) in\
+            enumerate(zip(size_of_team, reviews_of_team_in_round)):
+        for r, c in enumerate(counts):
+            assert size == len(c),\
+                "Team {} has size {} but reviewers {} in round {}"\
+                .format(team, size, c, r)
 
 
 # Write the review assignments to file.
