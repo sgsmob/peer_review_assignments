@@ -2,11 +2,9 @@
 Given a set of groups of people, assign each person a set of teams whose work they will review.
 
 ## Usage
-`python team_assignments.py [team_sizes] [num_reviews] [output_file]`
+Run script with no arguments from the command line, IDE, etc.
 
-Use the `-h` flag for more details
-
-Arguments:
+To change the arguments, edit the following variables in `main()` 
   * `team_sizes`:  Filename whose contents are the sizes of the teams, one size per line.
   * `num_reviews`:  Integer number of reviews per person.
   * `output_file`:  Filename to write the results.  File format has a row for each person (0-indexed!), each of which contains their team, and then then teams they need to review, in order.
